@@ -10,8 +10,9 @@ from sklearn.tree import DecisionTreeRegressor
 ### ADD EXTRA LIBRARIES HERE ###
 ################################
 
+from scipy import stats
 from sklearn import cross_validation
-from sklearn.metrics import mean_squared_error, make_scorer
+from sklearn.metrics import median_absolute_error, make_scorer
 from sklearn.grid_search import GridSearchCV
 
 
@@ -28,7 +29,12 @@ def explore_city_data(city_data):
     # Get the labels and features from the housing data
     housing_prices = city_data.target
     housing_features = city_data.data
-    print city_data.feature_names
+    q75, q25 = np.percentile(housing_prices, [75 ,25])
+    iqr = q75 - q25
+    print q25
+    print q75
+    print iqr
+    prices_graph(housing_prices)
 
     ###################################
     ### Step 1. YOUR CODE GOES HERE ###
@@ -56,6 +62,7 @@ def explore_city_data(city_data):
     # Calculate standard deviation?
     standard_deviation = np.nanstd(housing_prices)
 
+    print "Data size: " + str(data_size)
     print "Feature count: " + str(feature_count)
     print "Minimum price: " + str(min_price)
     print "Maximum price: " + str(max_price)
@@ -74,7 +81,7 @@ def split_data(city_data):
     ### Step 2. YOUR CODE GOES HERE ###
     ###################################
 
-    X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_size = 0.3)
+    X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_size = 0.3, random_state = 0)
     return X_train, y_train, X_test, y_test
 
 
@@ -87,7 +94,7 @@ def performance_metric(label, prediction):
 
     # The following page has a table of scoring functions in sklearn:
     # http://scikit-learn.org/stable/modules/classes.html#sklearn-metrics-metrics
-    return mean_squared_error(label, prediction)
+    return median_absolute_error(label, prediction)
 
 
 def learning_curve(depth, X_train, y_train, X_test, y_test):
@@ -115,6 +122,13 @@ def learning_curve(depth, X_train, y_train, X_test, y_test):
     # Plot learning curve graph
     learning_curve_graph(sizes, train_err, test_err)
 
+def prices_graph(prices):
+    """Plot housing prices."""
+    prices = sorted(prices)
+    fit = stats.norm.pdf(prices, np.mean(prices), np.std(prices))  #this is a fitting indeed
+    pl.plot(prices ,fit, '-o')
+    pl.hist(prices, normed=True)      #use this to draw histogram of your data
+    pl.show()
 
 def learning_curve_graph(sizes, train_err, test_err):
     """Plot training and test error as a function of the training size."""
@@ -189,13 +203,13 @@ def fit_predict_model(city_data):
     # 1. Find an appropriate performance metric. This should be the same as the
     # one used in your performance_metric procedure above:
     # http://scikit-learn.org/stable/modules/generated/sklearn.metrics.make_scorer.html
-    mean_squared_error_scorer = make_scorer(mean_squared_error, greater_is_better = False)
+    median_absolute_error_scorer = make_scorer(median_absolute_error, greater_is_better = False)
 
     # 2. We will use grid search to fine tune the Decision Tree Regressor and
     # obtain the parameters that generate the best training performance. Set up
     # the grid search object here.
     # http://scikit-learn.org/stable/modules/generated/sklearn.grid_search.GridSearchCV.html#sklearn.grid_search.GridSearchCV
-    grid = GridSearchCV(estimator = regressor, param_grid = parameters, scoring = mean_squared_error_scorer)
+    grid = GridSearchCV(estimator = regressor, param_grid = parameters, scoring = median_absolute_error_scorer)
     grid.fit(X, y)
 
     print "Best Params: " + str(grid.best_params_)
@@ -228,12 +242,12 @@ def main():
     X_train, y_train, X_test, y_test = split_data(city_data)
 
     # Learning Curve Graphs
-    max_depths = [1,2,3,4,5,6,7,8,9,10]
-    for max_depth in max_depths:
-        learning_curve(max_depth, X_train, y_train, X_test, y_test)
+    # max_depths = [1,2,3,4,5,6,7,8,9,10]
+    # for max_depth in max_depths:
+    #     learning_curve(max_depth, X_train, y_train, X_test, y_test)
 
     # Model Complexity Graph
-    model_complexity(X_train, y_train, X_test, y_test)
+    # model_complexity(X_train, y_train, X_test, y_test)
 
     # Tune and predict Model
     fit_predict_model(city_data)
