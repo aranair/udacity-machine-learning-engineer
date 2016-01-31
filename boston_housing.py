@@ -10,7 +10,9 @@ from sklearn.tree import DecisionTreeRegressor
 ### ADD EXTRA LIBRARIES HERE ###
 ################################
 
-from sklearn.metrics import mean_squared_error
+from sklearn import cross_validation
+from sklearn.metrics import mean_squared_error, make_scorer
+from sklearn.grid_search import GridSearchCV
 
 
 def load_data():
@@ -26,6 +28,7 @@ def explore_city_data(city_data):
     # Get the labels and features from the housing data
     housing_prices = city_data.target
     housing_features = city_data.data
+    print city_data.feature_names
 
     ###################################
     ### Step 1. YOUR CODE GOES HERE ###
@@ -53,6 +56,13 @@ def explore_city_data(city_data):
     # Calculate standard deviation?
     standard_deviation = np.nanstd(housing_prices)
 
+    print "Feature count: " + str(feature_count)
+    print "Minimum price: " + str(min_price)
+    print "Maximum price: " + str(max_price)
+    print "Mean Price: " + str(mean_price)
+    print "Median Price: " + str(median_price)
+    print "Standard Deviation: " + str(standard_deviation)
+
 
 def split_data(city_data):
     """Randomly shuffle the sample set. Divide it into 70 percent training and 30 percent testing data."""
@@ -64,17 +74,7 @@ def split_data(city_data):
     ### Step 2. YOUR CODE GOES HERE ###
     ###################################
 
-    np.random.shuffle(X)
-    np.random.shuffle(y)
-
-    train_index = round(0.7 * y.size)
-
-    X_train = X[:train_index]
-    X_test = X[train_index:]
-
-    y_train = y[:train_index]
-    y_test = y[train_index:]
-
+    X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_size = 0.3)
     return X_train, y_train, X_test, y_test
 
 
@@ -178,7 +178,9 @@ def fit_predict_model(city_data):
     # Setup a Decision Tree Regressor
     regressor = DecisionTreeRegressor()
 
-    parameters = {'max_depth':(1,2,3,4,5,6,7,8,9,10)}
+    parameters = {
+        'max_depth': (1,2,3,4,5,6,7,8,9,10)
+    }
 
     ###################################
     ### Step 4. YOUR CODE GOES HERE ###
@@ -187,15 +189,22 @@ def fit_predict_model(city_data):
     # 1. Find an appropriate performance metric. This should be the same as the
     # one used in your performance_metric procedure above:
     # http://scikit-learn.org/stable/modules/generated/sklearn.metrics.make_scorer.html
+    mean_squared_error_scorer = make_scorer(mean_squared_error, greater_is_better = False)
 
     # 2. We will use grid search to fine tune the Decision Tree Regressor and
     # obtain the parameters that generate the best training performance. Set up
     # the grid search object here.
     # http://scikit-learn.org/stable/modules/generated/sklearn.grid_search.GridSearchCV.html#sklearn.grid_search.GridSearchCV
+    grid = GridSearchCV(estimator = regressor, param_grid = parameters, scoring = mean_squared_error_scorer)
+    grid.fit(X, y)
+
+    print "Best Params: " + str(grid.best_params_)
+
+    regressor.set_params(**grid.best_params_)
 
     # Fit the learner to the training data to obtain the best parameter set
     print "Final Model: "
-    print regressor.fit(X, y)
+    regressor.fit(X, y)
 
     # Use the model to predict the output of a particular sample
     x = [11.95, 0.00, 18.100, 0, 0.6590, 5.6090, 90.00, 1.385, 24, 680.0, 20.20, 332.09, 12.13]
@@ -220,8 +229,8 @@ def main():
 
     # Learning Curve Graphs
     max_depths = [1,2,3,4,5,6,7,8,9,10]
-    for max_depth in max_depths:
-        learning_curve(max_depth, X_train, y_train, X_test, y_test)
+    # for max_depth in max_depths:
+    #     learning_curve(max_depth, X_train, y_train, X_test, y_test)
 
     # Model Complexity Graph
     model_complexity(X_train, y_train, X_test, y_test)
