@@ -209,10 +209,16 @@ def fit_predict_model(city_data):
     # obtain the parameters that generate the best training performance. Set up
     # the grid search object here.
     # http://scikit-learn.org/stable/modules/generated/sklearn.grid_search.GridSearchCV.html#sklearn.grid_search.GridSearchCV
-    grid = GridSearchCV(estimator = regressor, param_grid = parameters, scoring = median_absolute_error_scorer)
+    grid = GridSearchCV(
+            estimator = regressor, 
+            param_grid = parameters, 
+            scoring = median_absolute_error_scorer, 
+            n_jobs = -1)
+
     grid.fit(X, y)
 
     print "Best Params: " + str(grid.best_params_)
+    print grid.grid_scores_
 
     regressor.set_params(**grid.best_params_)
 
@@ -223,6 +229,7 @@ def fit_predict_model(city_data):
     # Use the model to predict the output of a particular sample
     x = [11.95, 0.00, 18.100, 0, 0.6590, 5.6090, 90.00, 1.385, 24, 680.0, 20.20, 332.09, 12.13]
     y = regressor.predict(x)
+    print regressor
     print "House: " + str(x)
     print "Prediction: " + str(y)
 
@@ -242,7 +249,7 @@ def main():
     X_train, y_train, X_test, y_test = split_data(city_data)
 
     # Learning Curve Graphs
-    # max_depths = [1,2,3,4,5,6,7,8,9,10]
+    max_depths = [1,2,3,4,5,6,7,8,9,10]
     # for max_depth in max_depths:
     #     learning_curve(max_depth, X_train, y_train, X_test, y_test)
 
