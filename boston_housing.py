@@ -3,8 +3,10 @@
 # Load libraries
 import numpy as np
 import pylab as pl
+import pydot
 from sklearn import datasets
 from sklearn.tree import DecisionTreeRegressor
+from sklearn import tree
 
 ################################
 ### ADD EXTRA LIBRARIES HERE ###
@@ -12,7 +14,7 @@ from sklearn.tree import DecisionTreeRegressor
 
 from scipy import stats
 from sklearn import cross_validation
-from sklearn.metrics import median_absolute_error, make_scorer
+from sklearn.metrics import mean_squared_error, make_scorer
 from sklearn.grid_search import GridSearchCV
 
 
@@ -29,12 +31,24 @@ def explore_city_data(city_data):
     # Get the labels and features from the housing data
     housing_prices = city_data.target
     housing_features = city_data.data
-    q75, q25 = np.percentile(housing_prices, [75 ,25])
-    iqr = q75 - q25
-    print q25
-    print q75
-    print iqr
-    prices_graph(housing_prices)
+
+    # feature_indexes = range(0,13)
+    # for idx in feature_indexes:
+    #     feature_name = city_data.feature_names[idx]
+    #     pl.figure()
+    #     pl.title(feature_name + ' vs Price correlation')
+    #     pl.plot(housing_features[:, idx], housing_prices, 'bo')
+    #     pl.legend()
+    #     pl.xlabel(feature_name)
+    #     pl.ylabel('Price')
+    #     pl.savefig(feature_name+"_vs_price")
+
+        print feature_name + ": " + \
+        str(np.mean(housing_features[:,idx])) + \
+        " (std: " + str(np.nanstd(housing_features[:,idx])) + ")"
+
+    # prices_graph(housing_prices)
+    # boxplot(housing_prices)
 
     ###################################
     ### Step 1. YOUR CODE GOES HERE ###
@@ -94,8 +108,7 @@ def performance_metric(label, prediction):
 
     # The following page has a table of scoring functions in sklearn:
     # http://scikit-learn.org/stable/modules/classes.html#sklearn-metrics-metrics
-    return median_absolute_error(label, prediction)
-
+    return mean_squared_error(label, prediction)
 
 def learning_curve(depth, X_train, y_train, X_test, y_test):
     """Calculate the performance of the model after a set of training data."""
@@ -118,19 +131,29 @@ def learning_curve(depth, X_train, y_train, X_test, y_test):
         train_err[i] = performance_metric(y_train[:s], regressor.predict(X_train[:s]))
         test_err[i] = performance_metric(y_test, regressor.predict(X_test))
 
+    # if depth >= 4 and depth <= 6:
+    #     pl.figure()
+    #     pl.plot(y_test, 'bo')
+    #     pl.plot(regressor.predict(X_test), color='red')
+    #     pl.savefig("test_data_depth_" + str(depth))
 
     # Plot learning curve graph
-    learning_curve_graph(sizes, train_err, test_err)
+    learning_curve_graph(sizes, train_err, test_err, depth)
+
+def boxplot(prices):
+    """Plot boxplot of housing prices."""
+    pl.boxplot(prices)
+    pl.savefig('boxplot')
 
 def prices_graph(prices):
     """Plot housing prices."""
     prices = sorted(prices)
-    fit = stats.norm.pdf(prices, np.mean(prices), np.std(prices))  #this is a fitting indeed
+    fit = stats.norm.pdf(prices, np.mean(prices), np.std(prices))
     pl.plot(prices ,fit, '-o')
-    pl.hist(prices, normed=True)      #use this to draw histogram of your data
-    pl.show()
+    pl.hist(prices, normed=True)
+    pl.savefig('prices_distribution')
 
-def learning_curve_graph(sizes, train_err, test_err):
+def learning_curve_graph(sizes, train_err, test_err, depth):
     """Plot training and test error as a function of the training size."""
 
     pl.figure()
@@ -140,6 +163,7 @@ def learning_curve_graph(sizes, train_err, test_err):
     pl.legend()
     pl.xlabel('Training Size')
     pl.ylabel('Error')
+    pl.savefig("learning_curve_depth_" + str(depth))
     pl.show()
 
 
@@ -180,6 +204,7 @@ def model_complexity_graph(max_depth, train_err, test_err):
     pl.legend()
     pl.xlabel('Max Depth')
     pl.ylabel('Error')
+    pl.savefig("model_complexity")
     pl.show()
 
 
@@ -203,22 +228,21 @@ def fit_predict_model(city_data):
     # 1. Find an appropriate performance metric. This should be the same as the
     # one used in your performance_metric procedure above:
     # http://scikit-learn.org/stable/modules/generated/sklearn.metrics.make_scorer.html
-    median_absolute_error_scorer = make_scorer(median_absolute_error, greater_is_better = False)
+    mean_squared_error_scorer = make_scorer(performance_metric, greater_is_better = False)
 
     # 2. We will use grid search to fine tune the Decision Tree Regressor and
     # obtain the parameters that generate the best training performance. Set up
     # the grid search object here.
     # http://scikit-learn.org/stable/modules/generated/sklearn.grid_search.GridSearchCV.html#sklearn.grid_search.GridSearchCV
     grid = GridSearchCV(
-            estimator = regressor, 
-            param_grid = parameters, 
-            scoring = median_absolute_error_scorer, 
+            estimator = regressor,
+            param_grid = parameters,
+            scoring = mean_squared_error_scorer,
             n_jobs = -1)
 
     grid.fit(X, y)
 
     print "Best Params: " + str(grid.best_params_)
-    print grid.grid_scores_
 
     regressor.set_params(**grid.best_params_)
 
@@ -229,7 +253,6 @@ def fit_predict_model(city_data):
     # Use the model to predict the output of a particular sample
     x = [11.95, 0.00, 18.100, 0, 0.6590, 5.6090, 90.00, 1.385, 24, 680.0, 20.20, 332.09, 12.13]
     y = regressor.predict(x)
-    print regressor
     print "House: " + str(x)
     print "Prediction: " + str(y)
 
@@ -250,11 +273,11 @@ def main():
 
     # Learning Curve Graphs
     max_depths = [1,2,3,4,5,6,7,8,9,10]
-    # for max_depth in max_depths:
-    #     learning_curve(max_depth, X_train, y_train, X_test, y_test)
+    for max_depth in max_depths:
+        learning_curve(max_depth, X_train, y_train, X_test, y_test)
 
     # Model Complexity Graph
-    # model_complexity(X_train, y_train, X_test, y_test)
+    model_complexity(X_train, y_train, X_test, y_test)
 
     # Tune and predict Model
     fit_predict_model(city_data)
