@@ -36,7 +36,7 @@ Grid search is an exhaustive search over different possible combinations of hype
 
 Cross-validation is a way for us to estimate how well the model will perform when it is asked to make predictions for unseen data, in other words, how well it generalises. The grid search uses this to evaluate each parameter combination. In specific, the K-fold cross-validation technique is used whereby the dataset is divided into K partitions, and each of the K partitions would be taken as test data to evaluate one parameter combination (running K times), and the average MSE taken for each parameter would be used for evaluation.
 
-Compared to a single train/test or train/test/validation split that can easily be biased (either through bad selection or unlucky randoming), the fact that the entire set of data is cycled through for the test partitions helps with this problem. Also, when the datasetis small, it is a good way to 'extend' the available test data (through the cycling of test partitions) for extensively testing the true performance of the model across more data.
+Compared to a single train/test or train/test/validation split that can easily be biased (either through bad cherry-picking or unlucky random selection), the fact that the entire set of data is cycled through for the test partitions and used for optimization helps with this problem. Also, when the dataset is relatively small, cross-validation allows us to 'extend' the available test data (through the cycling of test partitions) to more extensively test the performance of the model.
 
 # 3) Analyzing Model Performance
 
