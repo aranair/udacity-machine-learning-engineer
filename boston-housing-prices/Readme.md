@@ -13,7 +13,7 @@
 ## Measures of model performance
 **Which measure of model performance is best to use for predicting Boston housing data and analyzing the errors? Why do you think this measurement most appropriate? Why might the other measurements not be appropriate here?**
 
-The mean squared error would be the most appropriate measurement for this set of data for the analysis of the errors. The main reason is that MSE is more sensitive, penalising huge differences more at the same time. This helps us to detect even small differences in performance. On top of that, the decision tree regressor also uses MSE as the split criterion while building the model so MSE would be a sound choice here.
+The mean squared error would be the most appropriate measurement for this set of data for the analysis of the errors. The main reason is that MSE is more sensitive, penalising huge differences more at the same time. This helps us to detect even small differences in performance. 
 
 If we had used the median absolute error (MAE) for example, it is possible that we might not be able to tell apart the performance between parameters with errors that have similar medians, even if the overall performance using one set is better is better than the other. MAE would be suitable if we wanted to eliminate outliers while actually building a different model.
 
@@ -24,19 +24,19 @@ Technically, we could use the mean absolute error, but MSE would be a better pic
 
 How well a model performs is equivalent to how well it can predict future unseen data. We need some way to do this evaluation. The rationale that underlies the data split is that we can treat training data as "present" data and test data as "future" data, assuming that the trends remain the same. Holding back some of the present data for testing would be a fair method to having future data for testing. In other words, we can then use these test data to provide an objective assessment of the performance of the predictive model.  
 
-Without the split, and with the entire set of available data being fed as training data into the model; the model would then learn the training data perfectly yet would be incapable of predicting well on unseen data, an overfitted model.
+Without the split, it would be difficult to get any sort of metrics as to how the model is performing on unseen data, or if the model is underfitting or overfitting.
 
 --
 **What does grid search do and why might you want to use it?**
 
-Grid search is an exhaustive search over different possible combinations of hyperparameter values for a model. It cross-validates the results as it loops through every parameter combination to determine which set of parameter values gives us the best performance for a particular model. It is a systematic way to fine-tune or select a set of hyperparameters for the model that enables it to perform the best according to some performance metrics. The systematic and exhaustive nature of the grid search basically guarantees that the best set of parameters will be found, assuming the correct metrics is used (even if it would take a long time for bigger datasets).
+Grid search is an exhaustive search over different possible combinations of hyperparameter values for a model. It cross-validates the results as it loops through every parameter combination to determine which set of parameter values gives us the best performance for a particular model. It is a systematic way to fine-tune or select a set of hyperparameters for the model that enables it to perform the best according to some performance metrics. The systematic and exhaustive nature of the grid search basically guarantees that the best set of parameters will be found, assuming the correct metrics is used (even if it would take a long time for bigger datasets). In the case where the dataset is huge, or and when run-time is a critical factor, RandomizedSearch is an alternative to grid search where the run-time is very much reduced, while sacrificing a little performance since it does not permutate through every possible parameter.
 
 --
 **Why is cross validation useful and why might we use it with grid search?**
 
-Cross-validation is a way for us to estimate how well the model will perform when it is asked to make predictions for unseen data, in other words, how well it generalises. The grid search uses this to evaluate each parameter combination. In specific, the K-fold cross-validation technique is used whereby the dataset is divided into K partitions (in this case I've chosen 10), and each of the K partitions would be taken as test data to evaluate one parameter combination (running K times), and the average MSE taken for each parameter would be used for evaluation.
+Cross-validation is a way for us to estimate how well the model will perform when it is asked to make predictions for unseen data, in other words, how well it generalises. The grid search uses this to evaluate each parameter combination. In specific, the K-fold cross-validation technique is used whereby the dataset is divided into K partitions, and each of the K partitions would be taken as test data to evaluate one parameter combination (running K times), and the average MSE taken for each parameter would be used for evaluation.
 
-
+Compared to a single train/test or train/test/validation split that can easily be biased (either through bad selection or unlucky randoming), the fact that the entire set of data is cycled through for the test partitions helps with this problem. Also, when the datasetis small, it is a good way to 'extend' the available test data (through the cycling of test partitions) for extensively testing the true performance of the model across more data.
 
 # 3) Analyzing Model Performance
 
@@ -72,9 +72,9 @@ The optimal max depth found by grid search for multiple runs was between 4 to 6.
 
 **Compare prediction to earlier statistics and make a case if you think it is a valid model.**
 
-By examining the various feature's vs price graphs, we can generally see that there are a number of strongly correlated features such as CRIM (per capita crime rate by town), RM (average number of rooms per dwelling), LSTAT (% lower status of the population) and DIS (weighted distances to five Boston employment centres) and others. 
+By examining the various feature's vs price graphs, we can generally see that there are a number of strongly correlated features such as CRIM (per capita crime rate by town), RM (average number of rooms per dwelling), LSTAT (% lower status of the population) and DIS (weighted distances to five Boston employment centres) and others.  Also, judging from the graphs, CRIM being higher should indicate a price drop, RM being lower may mean a potential price drop as well, and similarly for DIS, which true enough is reflected in the predicted price between 20766 to 21629.74. It is well within 1 std of the mean price.
 
-Also, judging from the graphs, CRIM being higher should indicate a price drop, RM being lower may mean a potential price drop as well, and similarly for DIS, which true enough is reflected in the predicted price between 20766 to 21629.74. It is well within 1 std of the mean price.
+On top of that, using the NearestNeighbors algorithmns in scikit-learn to find the closest neighbours for the given feature values then averaging their prices, it comes up to ~$21520.00 (21.52) which also reflects well about the prediction range mentioned above.
 
 While the prediction of this one house may be fairly accurate on this one house, I do not feel that the model properly assigns weight to certain features that may have stronger correlations with the price, nor decrease the weight for lesser correlated features (nor remove for that matter). The decision tree also does not take into account inter-correlated features, and therefore may not perform well when certain features are evaluated. I conclude that perhaps the model is valid to some extent, yet insufficiently accurate.
 

@@ -5,8 +5,9 @@ import numpy as np
 import pylab as pl
 import pydot
 from sklearn import datasets
-from sklearn.tree import DecisionTreeRegressor
 from sklearn import tree
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.neighbors import NearestNeighbors
 
 ################################
 ### ADD EXTRA LIBRARIES HERE ###
@@ -42,10 +43,6 @@ def explore_city_data(city_data):
     #     pl.xlabel(feature_name)
     #     pl.ylabel('Price')
     #     pl.savefig(feature_name+"_vs_price")
-
-        print feature_name + ": " + \
-        str(np.mean(housing_features[:,idx])) + \
-        " (std: " + str(np.nanstd(housing_features[:,idx])) + ")"
 
     # prices_graph(housing_prices)
     # boxplot(housing_prices)
@@ -207,6 +204,11 @@ def model_complexity_graph(max_depth, train_err, test_err):
     pl.savefig("model_complexity")
     pl.show()
 
+def find_nearest_neighbor_indexes(x, X):
+   neigh = NearestNeighbors(n_neighbors = 10)
+   neigh.fit(X)
+   distance, indexes = neigh.kneighbors(x)
+   return indexes
 
 def fit_predict_model(city_data):
     """Find and tune the optimal model. Make a prediction on housing data."""
@@ -255,6 +257,14 @@ def fit_predict_model(city_data):
     y = regressor.predict(x)
     print "House: " + str(x)
     print "Prediction: " + str(y)
+
+    indexes = find_nearest_neighbor_indexes(x, X)
+    sum_prices = []
+    for i in indexes:
+        sum_prices.append(city_data.target[i])
+
+    neighbor_avg = np.mean(sum_prices)
+    print "Nearest Neighbors average: " + str(neighbor_avg)
 
 # In the case of the documentation page for GridSearchCV, it might be the case that the example is just a demonstration of syntax for use of the function, rather than a statement about
 def main():
