@@ -11797,7 +11797,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="c"># Import libraries</span>
@@ -11849,14 +11849,14 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="c"># TODO: Calculate number of students</span>
 <span class="n">n_students</span> <span class="o">=</span> <span class="n">student_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-<span class="c"># TODO: Calculate number of features</span>
-<span class="n">n_features</span> <span class="o">=</span> <span class="n">student_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="c"># -1 because of target column</span>
+<span class="n">n_features</span> <span class="o">=</span> <span class="n">student_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
 
 <span class="c"># TODO: Calculate passing students</span>
 <span class="n">n_passed</span> <span class="o">=</span> <span class="p">(</span><span class="n">student_data</span><span class="p">[</span><span class="n">student_data</span><span class="p">[</span><span class="s">&#39;passed&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;yes&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -11886,7 +11886,7 @@ div#notebook {
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Total number of students: 395
-Number of features: 31
+Number of features: 30
 Number of students who passed: 265
 Number of students who failed: 130
 Graduation rate of the class: 67.09%
@@ -11903,6 +11903,17 @@ Graduation rate of the class: 67.09%
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Characteristics:</strong> The given data set is relatively small, with quite a big number of features. The data set also has <strong>imbalanced data</strong>, with more students passing than failing. Some models do not perform well with this characteristic.</p>
+<p>In the bottom sections, I've also decided to use a Stratified shuffle split to ensure that both the training set and test set has roughly the same number of pass/fails. Otherwise, there could exist scenarios that end up with all the failing cases in the test and that wouldn't work very well.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Preparing-the-Data">Preparing the Data<a class="anchor-link" href="#Preparing-the-Data">&#182;</a></h2><p>In this section, we will prepare the data for modeling, training and testing.</p>
 <h3 id="Identify-feature-and-target-columns">Identify feature and target columns<a class="anchor-link" href="#Identify-feature-and-target-columns">&#182;</a></h3><p>It is often the case that the data you obtain contains non-numeric features. This can be a problem, as most machine learning algorithms expect numeric data to perform computations with.</p>
 <p>Run the code cell below to separate the student data into feature and target columns to see if any features are non-numeric.</p>
@@ -11912,7 +11923,7 @@ Graduation rate of the class: 67.09%
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="c"># Extract feature columns</span>
@@ -11994,7 +12005,7 @@ Feature values:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="k">def</span> <span class="nf">preprocess_features</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
@@ -12065,7 +12076,7 @@ Feature values:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">cross_validation</span>
@@ -12192,8 +12203,7 @@ Testing set has 95 samples.
 </ul>
 </li>
 <li>Disadvantages: <ul>
-<li>Sensitive to choice of features; bad results if the wrong features are chosen.</li>
-<li>Tend to overfit, overstating the accuracy of its predictions</li>
+<li>Requires higher number of data points to achieve a stable result.</li>
 </ul>
 </li>
 </ul>
@@ -12224,7 +12234,7 @@ Testing set has 95 samples.
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="k">def</span> <span class="nf">train_classifier</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">):</span>
@@ -12550,7 +12560,7 @@ F1 score for test set: 0.7519.
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Answer: </strong>  If we're only evaluating based on absolute accuracy, I believe the SVM model will end up getting a better score than the other two approaches after fine tuning. However, given the constraints of limited resources, I think we should favor simpler approaches. The SVM approach take significant computation to train and predict as compared to the other 2 models.</p>
 <p>Judging from the how the random forest is over-fitting on the training data while still having a relatively low test score, I feel that that I'll probably need to tune the model by increasing the number of trees involved via <em>n_estimators</em> and consequently the complexity of the random forest which means the time-complexity will surely increase: <strong>O(v*nlog(n))</strong> The viability of the model, given our limited computation resources, is lowered because of this.</p>
-<p>Logistic regression is the simplest model to visualize for the board of directors (the other two are essentially blackboxes. It is also extremely efficient and consumes very little computational power and memory to train and predict compared to the other two more complex algorithms. The results on the test set seem reasonably close to the other two algorithms after fine-tuning too. Also, as the training set is expected to grow steadily over a decade, overfitting becomes less of a issue for logistic regression eventually, thus the results will only get more accurate. On top of that, the school can also back-track and find the estimated regression coefficients of a log scale and interpret the effects of each feature in future to help with developing the intervention.</p>
+<p>Logistic regression is the simplest model to visualize for the board of directors (the other two are essentially blackboxes. It is also extremely efficient and consumes very little computational power and memory to train and predict compared to the other two more complex algorithms. The scores on the training set seem reasonably close to the other two algorithms too. Another consideration is that, as the training set is expected to grow steadily over a decade, overfitting becomes less of a issue for logistic regression eventually, thus the results will only get more accurate. On top of that, the school can also back-track and find the estimated regression coefficients of a log scale and interpret the effects of each feature in future to help with developing the intervention.</p>
 <p><strong>Therefore, I would argue that the <em>most appropriate</em> model and a reasonable compromise between accuracy and resource-usage in this case would be the Logistic Regression.</strong></p>
 
 </div>
@@ -12571,7 +12581,10 @@ F1 score for test set: 0.7519.
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>Answer: </strong> Logistic regression works similar to a linear regression model but is used only when the dependent variable is categorical, e.g. whether a student passes or fails. There is a <em>link</em> function which is defined as the log of odds: ln(P/1-P) where P is the probability of a student passing. This provides the model with the continuous value that is used for standard linear regression. Fitting the data refers to the same as linear regression analysis e.g. minimizing the error between expected value and actual via the <em>link</em> function. This yields the coefficients, or significance of each feature and a predictor function (fitted model). When making a prediction, the value obtained via the predictor function is converted back via an exponential function (reverse of log) to obtain the probability that the expected value is a 1 or 0 (pass or fail).</p>
+<p><strong>Answer: </strong></p>
+<p>Logistic regression works similar to a linear regression model but is used only when the dependent variable is categorical, e.g. whether a student passes or fails. There is a <em>link</em> or cost function typically involved with this particular type of models and in our case, it is described as a "log of odds", but there are many other functions that could serve as the link function. It basically provides the model with the continuous value that is used for standard linear regression.</p>
+<p>During the initial training, the model minimizes the function to assign a coefficient or weight to each feature.</p>
+<p>When we are making a prediction, we take all the feature values and multiply them by their corresponding coefficients and sum them up. The final result is then passed through an exponential function which reverses the log and outputs the probability that the expected value is a 1 or 0 (pass or fail).</p>
 
 </div>
 </div>
@@ -12602,24 +12615,24 @@ F1 score for test set: 0.7519.
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[45]:</div>
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">make_scorer</span>
+<div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">f1_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">make_scorer</span>
 <span class="kn">from</span> <span class="nn">sklearn.grid_search</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
 <span class="kn">from</span> <span class="nn">sklearn.cross_validation</span> <span class="kn">import</span> <span class="n">StratifiedShuffleSplit</span>
-<span class="kn">from</span> <span class="nn">sklearn.cross_validation</span> <span class="kn">import</span> <span class="n">KFold</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
 
 <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;C&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.005</span><span class="p">,</span> <span class="mf">0.0075</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span> <span class="p">}</span>
 
 <span class="n">clf</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">()</span>
 
-<span class="k">def</span> <span class="nf">performance_metric</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">prediction</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">f1_score</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">pos_label</span><span class="o">=</span><span class="s">&#39;yes&#39;</span><span class="p">)</span>
+<span class="n">f1_scorer</span> <span class="o">=</span> <span class="n">make_scorer</span><span class="p">(</span><span class="n">f1_score</span><span class="p">,</span> <span class="n">pos_label</span><span class="o">=</span><span class="s">&quot;yes&quot;</span><span class="p">)</span>
 
-<span class="n">f1_scorer</span> <span class="o">=</span> <span class="n">make_scorer</span><span class="p">(</span><span class="n">performance_metric</span><span class="p">)</span>
-
-<span class="n">grid_obj</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">param_grid</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="n">f1_scorer</span><span class="p">)</span>
+<span class="c"># Stratified because of the imbalanced data</span>
+<span class="n">sss</span> <span class="o">=</span> <span class="n">StratifiedShuffleSplit</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">grid_obj</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">param_grid</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="n">f1_scorer</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">sss</span><span class="p">)</span>
 <span class="n">grid_obj</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 <span class="k">print</span> <span class="s">&quot;Best Params: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">grid_obj</span><span class="o">.</span><span class="n">best_params_</span><span class="p">)</span>
 
@@ -12642,7 +12655,7 @@ F1 score for test set: 0.7519.
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Best Params: {&#39;C&#39;: 0.05}
-Made predictions in 0.0007 seconds.
+Made predictions in 0.0010 seconds.
 Tuned model has a training F1 score of 0.8348.
 Made predictions in 0.0003 seconds.
 Tuned model has a testing F1 score of 0.8138.
