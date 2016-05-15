@@ -12558,7 +12558,8 @@ F1 score for test set: 0.7519.
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>Answer: </strong>  If we're only evaluating based on absolute accuracy, I believe the SVM model will end up getting a better score than the other two approaches after fine tuning. However, given the constraints of limited resources, I think we should favor simpler approaches. The SVM approach take significant computation to train and predict as compared to the other 2 models.</p>
+<p><strong>Answer: </strong></p>
+<p>If we're only evaluating based on performance, I believe the SVM model will end up getting a better score than the other two approaches after fine tuning. However, given the constraints of limited resources, I think we should favor simpler approaches. The SVM approach take significant computation to train and predict as compared to the other 2 models.</p>
 <p>Judging from the how the random forest is over-fitting on the training data while still having a relatively low test score, I feel that that I'll probably need to tune the model by increasing the number of trees involved via <em>n_estimators</em> and consequently the complexity of the random forest which means the time-complexity will surely increase: <strong>O(v*nlog(n))</strong> The viability of the model, given our limited computation resources, is lowered because of this.</p>
 <p>Logistic regression is the simplest model to visualize for the board of directors (the other two are essentially blackboxes. It is also extremely efficient and consumes very little computational power and memory to train and predict compared to the other two more complex algorithms. The scores on the training set seem reasonably close to the other two algorithms too. Another consideration is that, as the training set is expected to grow steadily over a decade, overfitting becomes less of a issue for logistic regression eventually, thus the results will only get more accurate. On top of that, the school can also back-track and find the estimated regression coefficients of a log scale and interpret the effects of each feature in future to help with developing the intervention.</p>
 <p><strong>Therefore, I would argue that the <em>most appropriate</em> model and a reasonable compromise between accuracy and resource-usage in this case would be the Logistic Regression.</strong></p>
@@ -12582,9 +12583,9 @@ F1 score for test set: 0.7519.
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Answer: </strong></p>
-<p>Logistic regression works similar to a linear regression model but is used only when the dependent variable is categorical, e.g. whether a student passes or fails. There is a <em>link</em> or cost function typically involved with this particular type of models and in our case, it is described as a "log of odds", but there are many other functions that could serve as the link function. It basically provides the model with the continuous value that is used for standard linear regression.</p>
-<p>During the initial training, the model minimizes the function to assign a coefficient or weight to each feature.</p>
-<p>When we are making a prediction, we take all the feature values and multiply them by their corresponding coefficients and sum them up. The final result is then passed through an exponential function which reverses the log and outputs the probability that the expected value is a 1 or 0 (pass or fail).</p>
+<p>1) Logistic regression works similar to linear regression but it uses a function A that expresses the prediction in terms of probability. More specifically in our case, if you have a value of &gt;0.5, we then interpret it as a good chance that the student will pass.</p>
+<p>2) During the initlal training, the function is minimized to assign a weight to each variable in our data such as <strong>failures</strong> (number of past class failures).</p>
+<p>3) When we are making a prediction, we take all the variable values and multiply them by their corresponding weights and sum them up. It then reverses the function A earlier, to obtain a probability of whether a student will pass or not as described in 1).</p>
 
 </div>
 </div>
@@ -12615,7 +12616,7 @@ F1 score for test set: 0.7519.
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">f1_score</span>
@@ -12631,7 +12632,7 @@ F1 score for test set: 0.7519.
 <span class="n">f1_scorer</span> <span class="o">=</span> <span class="n">make_scorer</span><span class="p">(</span><span class="n">f1_score</span><span class="p">,</span> <span class="n">pos_label</span><span class="o">=</span><span class="s">&quot;yes&quot;</span><span class="p">)</span>
 
 <span class="c"># Stratified because of the imbalanced data</span>
-<span class="n">sss</span> <span class="o">=</span> <span class="n">StratifiedShuffleSplit</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">sss</span> <span class="o">=</span> <span class="n">StratifiedShuffleSplit</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">111</span><span class="p">)</span>
 <span class="n">grid_obj</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">param_grid</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="n">f1_scorer</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">sss</span><span class="p">)</span>
 <span class="n">grid_obj</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 <span class="k">print</span> <span class="s">&quot;Best Params: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">grid_obj</span><span class="o">.</span><span class="n">best_params_</span><span class="p">)</span>
@@ -12655,7 +12656,7 @@ F1 score for test set: 0.7519.
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Best Params: {&#39;C&#39;: 0.05}
-Made predictions in 0.0010 seconds.
+Made predictions in 0.0006 seconds.
 Tuned model has a training F1 score of 0.8348.
 Made predictions in 0.0003 seconds.
 Tuned model has a testing F1 score of 0.8138.
