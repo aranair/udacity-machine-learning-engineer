@@ -12583,9 +12583,9 @@ F1 score for test set: 0.7519.
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Answer: </strong></p>
-<p>1) Logistic regression works similar to linear regression but it uses a function A that expresses the prediction in terms of probability. More specifically in our case, if you have a value of &gt;0.5, we then interpret it as a good chance that the student will pass.</p>
-<p>2) During the initlal training, the function is minimized to assign a weight to each variable in our data such as <strong>failures</strong> (number of past class failures).</p>
-<p>3) When we are making a prediction, we take all the variable values and multiply them by their corresponding weights and sum them up. It then reverses the function A earlier, to obtain a probability of whether a student will pass or not as described in 1).</p>
+<p>1) Logistic regression outputs the prediction in terms of probability. More specifically in our case, if you have a value of &gt;0.5, we interpret it as a good chance that the student will pass.</p>
+<p>2) During the initlal training, a function is minimized to assign a weight to each variable in our data such as <strong>failures</strong> (number of past class failures).</p>
+<p>3) When we are making a prediction, we take all the variable values and multiply them by their corresponding weights and sum them up and then modified to obtain a probability of whether a student will pass or not.</p>
 
 </div>
 </div>
