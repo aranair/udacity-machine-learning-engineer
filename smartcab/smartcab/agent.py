@@ -128,11 +128,11 @@ def run():
     """Run the agent for a finite number of trials."""
 
     #### Values used for testing ####
-    gammas = [0.1, 0.2, 0.3, 0.4, 0.5] # discount
-    alphas = [0.5, 0.6, 0.7, 0.8, 0.9] # learning
+    # gammas = [0.1, 0.2, 0.3, 0.4, 0.5] # discount
+    # alphas = [0.5, 0.6, 0.7, 0.8, 0.9] # learning
 
-    # gammas = [0.3]
-    # alphas = [0.5]
+    gammas = [0.1]
+    alphas = [0.8]
     epsilon = 0.9
 
     df = pd.DataFrame(columns=['Gamma', 'Alpha', 'PenaltyFree', 'DestinationReached', 'Reward/Action Ratio'])
@@ -141,7 +141,7 @@ def run():
 
     # create environment (also adds some dummy traffic)
     e = Environment()
-    sim = Simulator(e, update_delay=2)  # reduce update_delay to speed up simulation
+    sim = Simulator(e, update_delay=0)  # reduce update_delay to speed up simulation
     a = e.create_agent(LearningAgent)  # create agent
     e.set_primary_agent(a, enforce_deadline=True)  # set agent to track
 
