@@ -20,6 +20,7 @@ class LearningAgent(Agent):
         # TODO: Initialize any additional variables here
         self.resetAttributes()
 
+    # 0.2 and 0.8 are DEFAULT values that are overriden in the actual runs
     def resetAttributes(self, gamma=0.2, alpha=0.8, epsilon=0.9):
         self.state = None
         self.qTable = {}
@@ -116,28 +117,28 @@ class LearningAgent(Agent):
         newVal = oldVal + self.alpha * (reward + self.gamma * maxQ2 - oldVal)
         self.setQ(self.state, action, newVal)
 
-        # print 'Proposed: ', self.next_waypoint
         # print 'Action: ', action
         # print 'Max Q2:', maxQ2
         # print 'Old Q Value: ', oldVal
         # print 'New Q Value: ', newVal
         # print 'Total penalties: ', self.totalPenalties
-        # print "LearningAgent.update(): deadline = {}, inputs = {}, action = {}, reward = {}".format(deadline, inputs, action, reward)  # [debug]
+        print 'Proposed: ', self.next_waypoint
+        print "LearningAgent.update(): deadline = {}, inputs = {}, action = {}, reward = {}".format(deadline, inputs, action, reward)  # [debug]
 
 def run():
     """Run the agent for a finite number of trials."""
 
-    #### Values used for testing ####
+    #------------------ Values used for parameter tuning -----------------#
     # gammas = [0.1, 0.2, 0.3, 0.4, 0.5] # discount
     # alphas = [0.5, 0.6, 0.7, 0.8, 0.9] # learning
 
     gammas = [0.1]
     alphas = [0.8]
     epsilon = 0.9
+    runSetCount = 1
+    index = 0
 
     df = pd.DataFrame(columns=['Gamma', 'Alpha', 'PenaltyFree', 'DestinationReached', 'Reward/Action Ratio'])
-
-    index = 0
 
     # create environment (also adds some dummy traffic)
     e = Environment()
@@ -152,7 +153,7 @@ def run():
             rewardActionValues = []
 
             # Now simulate it 3 times for average of values
-            for z in range(3):
+            for z in range(runSetCount):
                 # This resets qTable as well so that multiple simulations of 100 runs are not artificially enhanced
                 a.resetAttributes(alpha=alpha, gamma=gamma, epsilon=epsilon)
                 sim.run(n_trials=100)  # press Esc or close pygame window to quit
